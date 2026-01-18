@@ -1,0 +1,16 @@
+name: jgeek00/opencloud
+description: "OpenCloud bruteforce detection and prevention"
+author: JGeek00
+labels:
+  service: opencloud
+  type: bruteforce
+  remediation: true
+
+parsers:
+  - jgeek00/opencloud-logs
+  - jgeek00/opencloud-logs-enrich
+
+scenarios:
+  - jgeek00/opencloud-bf
+  - jgeek00/opencloud-bf_user-enum
+  - jgeek00/opencloud-bf_distributed
