@@ -1,0 +1,40 @@
+filter: "evt.Line.Labels.type == 'opencloud'"
+onsuccess: next_stage
+name: jgeek00/opencloud-logs
+description: "Parse OpenCloud JSON logs for failed authentication"
+statics:
+  - target: evt.Parsed.log_level
+    expression: JsonExtract(evt.Line.Raw, "level")
+  - target: evt.Parsed.service
+    expression: JsonExtract(evt.Line.Raw, "service")
+  - target: evt.Parsed.error_message
+    expression: JsonExtract(evt.Line.Raw, "error")
+  - target: evt.Parsed.authenticator
+    expression: JsonExtract(evt.Line.Raw, "authenticator")
+  - target: evt.Parsed.path
+    expression: JsonExtract(evt.Line.Raw, "path")
+  - target: evt.Parsed.user_agent
+    expression: JsonExtract(evt.Line.Raw, "user_agent")
+  - target: evt.Parsed.client_ip
+    expression: JsonExtract(evt.Line.Raw, "client.address")
+  - target: evt.Parsed.message
+    expression: JsonExtract(evt.Line.Raw, "message")
+  - target: evt.Parsed.time
+    expression: JsonExtract(evt.Line.Raw, "time")
+  - target: evt.Meta.log_type
+    expression: |
+      evt.Parsed.log_level == "error" && 
+      (evt.Parsed.message contains "failed to authenticate" || 
+       evt.Parsed.error_message contains "failed to verify access token" ||
+       evt.Parsed.error_message contains "token signature is invalid") ? 
+      "opencloud_failed_auth" : ""
+  - target: evt.Meta.source_ip
+    expression: evt.Parsed.client_ip
+  - target: evt.Meta.service
+    value: opencloud
+  - target: evt.Meta.http_path
+    expression: evt.Parsed.path
+  - target: evt.Meta.http_user_agent
+    expression: evt.Parsed.user_agent
+  - target: evt.StrTime
+    expression: evt.Parsed.time
