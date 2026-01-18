@@ -1,0 +1,59 @@
+# OpenCloud BF scan
+name: jgeek00/opencloud-bf
+description: "Detect OpenCloud bruteforce"
+filter: "evt.Meta.log_type == 'opencloud_failed_auth'"
+#debug: true
+type: leaky
+groupby: evt.Meta.source_ip
+leakspeed: "20s"
+capacity: 5
+blackhole: 1m
+labels:
+  service: opencloud
+  confidence: 3
+  spoofable: 0
+  classification:
+    - attack.T1110
+  label: "OpenCloud Bruteforce"
+  behavior: "http:bruteforce"
+  remediation: true
+---
+# OpenCloud user-enum
+type: leaky
+name: jgeek00/opencloud-bf_user-enum
+description: "Detect OpenCloud user enum bruteforce"
+filter: "evt.Meta.log_type == 'opencloud_failed_auth'"
+groupby: evt.Meta.source_ip
+distinct: evt.Meta.http_path
+leakspeed: 10s
+capacity: 5
+blackhole: 1m
+labels:
+  service: opencloud
+  confidence: 3
+  spoofable: 0
+  classification:
+    - attack.T1589
+  label: "OpenCloud User Enumeration"
+  behavior: "http:bruteforce"
+  remediation: true
+---
+# OpenCloud distributed bruteforce
+type: leaky
+name: jgeek00/opencloud-bf_distributed
+description: "Detect distributed OpenCloud bruteforce attempts"
+filter: "evt.Meta.log_type == 'opencloud_failed_auth'"
+groupby: evt.Meta.http_path
+distinct: evt.Meta.source_ip
+leakspeed: 30s
+capacity: 10
+blackhole: 5m
+labels:
+  service: opencloud
+  confidence: 2
+  spoofable: 0
+  classification:
+    - attack.T1110
+  label: "OpenCloud Distributed Bruteforce"
+  behavior: "http:bruteforce"
+  remediation: true
