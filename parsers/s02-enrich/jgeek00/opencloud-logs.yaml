@@ -1,0 +1,9 @@
+filter: "evt.Meta.log_type == 'opencloud_failed_auth'"
+onsuccess: next_stage
+name: jgeek00/opencloud-logs-enrich
+description: "Enrich OpenCloud failed authentication logs"
+statics:
+  - target: evt.StrTime
+    expression: JsonExtract(evt.Line.Raw, "time")
+  - target: evt.Meta.service
+    value: opencloud
